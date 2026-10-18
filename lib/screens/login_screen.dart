@@ -16,6 +16,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   String? _errorMessage;
 
+  bool _isLoading = false;
+  bool _isGoogleLoading = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -23,14 +26,38 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() {
+  Future<void> _handleLogin() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final error = AuthService().login(
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final error = await AuthService().loginAsync(
         _emailController.text,
         _passwordController.text,
       );
 
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = error;
+        });
+      }
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() {
+      _isGoogleLoading = true;
+      _errorMessage = null;
+    });
+
+    final error = await AuthService().signInWithGoogle();
+
+    if (mounted) {
       setState(() {
+        _isGoogleLoading = false;
         _errorMessage = error;
       });
     }
@@ -160,11 +187,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       const SizedBox(height: 24),
+
+                      // Email/Password Login Button
                       SizedBox(
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: _handleLogin,
+                          onPressed: (_isLoading || _isGoogleLoading) ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.colorScheme.primary,
                             foregroundColor: Colors.white,
@@ -173,13 +202,80 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             elevation: 2,
                           ),
-                          child: const Text(
-                            'ENTRAR',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'ENTRAR',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      const Row(
+                        children: [
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'OU',
+                              style: TextStyle(color: Colors.grey, fontSize: 12),
                             ),
                           ),
+                          Expanded(child: Divider()),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Google Sign-In Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: (_isLoading || _isGoogleLoading)
+                              ? null
+                              : _handleGoogleSignIn,
+                          style: OutlinedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            side: BorderSide(color: Colors.grey[300]!),
+                          ),
+                          child: _isGoogleLoading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.g_mobiledata,
+                                      size: 36,
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Entrar com o Google',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                     ],

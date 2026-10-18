@@ -5,6 +5,7 @@ import '../services/event_service.dart';
 import '../widgets/event_card.dart';
 import 'event_detail_screen.dart';
 import 'event_form_screen.dart';
+import 'feedback_screen.dart';
 
 class EventListScreen extends StatefulWidget {
   const EventListScreen({super.key});
@@ -87,6 +88,18 @@ class _EventListScreenState extends State<EventListScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.mail_outline),
+            tooltip: 'Contato / Feedback (Formspree)',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FeedbackScreen(),
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sair',

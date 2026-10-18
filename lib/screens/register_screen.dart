@@ -27,20 +27,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  bool _isLoading = false;
+
+  Future<void> _handleRegister() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final error = AuthService().register(
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final error = await AuthService().registerAsync(
         _nameController.text,
         _emailController.text,
         _passwordController.text,
       );
 
-      if (error != null) {
+      if (mounted) {
         setState(() {
-          _errorMessage = error;
+          _isLoading = false;
         });
-      } else {
-        Navigator.pop(context);
+
+        if (error != null) {
+          setState(() {
+            _errorMessage = error;
+          });
+        } else {
+          Navigator.pop(context);
+        }
       }
     }
   }
@@ -179,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _handleRegister,
+                    onPressed: _isLoading ? null : _handleRegister,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.primary,
                       foregroundColor: Colors.white,
@@ -187,13 +200,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text(
-                      'CADASTRAR',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'CADASTRAR',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
