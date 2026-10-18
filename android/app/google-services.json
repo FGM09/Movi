@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "392238921760",
+    "project_id": "movi-52ad1",
+    "storage_bucket": "movi-52ad1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:392238921760:android:45619327c23fb744106445",
+        "android_client_info": {
+          "package_name": "com.example.Movi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqRWCPzOOKGN998eT2k7hAhbatNF1OohA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
